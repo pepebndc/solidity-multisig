@@ -83,7 +83,7 @@ contract MultisigWallet {
             Transaction({to: _to, value: _value, data: _data, executed: false, numConfirmations: 0})
         );
 
-        confirmTransaction(txIndex);
+        confirmTransaction(txIndex, true);
 
         emit SubmitTransaction(msg.sender, txIndex, _to, _value, _data);
     }
