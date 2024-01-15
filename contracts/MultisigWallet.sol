@@ -89,11 +89,16 @@ contract MultisigWallet {
     }
 
     function confirmTransaction(
-        uint _txIndex
+        uint _txIndex,
+        bool _execute
     ) public onlyOwner txExists(_txIndex) notExecuted(_txIndex) notConfirmed(_txIndex) {
         Transaction storage transaction = transactions[_txIndex];
         transaction.numConfirmations += 1;
         isConfirmed[_txIndex][msg.sender] = true;
+
+        if (_execute && transaction.numConfirmations >= numConfirmationsRequired) {
+            executeTransaction(_txIndex);
+        }
 
         emit ConfirmTransaction(msg.sender, _txIndex);
     }
