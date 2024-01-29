@@ -167,4 +167,8 @@ contract MultisigWallet {
         }
         return result;
     }
+
+    function getSignedUsersInTransaction(uint _txIndex) public view returns (address[] memory) {
+        return transactions[_txIndex].signers;
+    }
 }
