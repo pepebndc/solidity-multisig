@@ -24,6 +24,9 @@ contract MultisigWallet {
         bytes data;
         bool executed;
         uint numConfirmations;
+        uint creationTimestamp;
+        uint executionTimestamp;
+        address[] signers;
     }
 
     // mapping from tx index => owner => bool
@@ -80,7 +83,16 @@ contract MultisigWallet {
         uint txIndex = transactions.length;
 
         transactions.push(
-            Transaction({to: _to, value: _value, data: _data, executed: false, numConfirmations: 0})
+            Transaction({
+                to: _to,
+                value: _value,
+                data: _data,
+                executed: false,
+                numConfirmations: 0,
+                signers: new address[](owners.length),
+                creationTimestamp: block.timestamp,
+                executionTimestamp: 0
+            })
         );
 
         confirmTransaction(txIndex, true);
@@ -95,6 +107,8 @@ contract MultisigWallet {
         Transaction storage transaction = transactions[_txIndex];
         transaction.numConfirmations += 1;
         isConfirmed[_txIndex][msg.sender] = true;
+
+        transaction.signers.push(msg.sender);
 
         if (_execute && transaction.numConfirmations >= numConfirmationsRequired) {
             executeTransaction(_txIndex);
@@ -111,6 +125,7 @@ contract MultisigWallet {
         require(transaction.numConfirmations >= numConfirmationsRequired, "cannot execute tx");
 
         transaction.executed = true;
+        transaction.executionTimestamp = block.timestamp;
 
         (bool success, ) = transaction.to.call{value: transaction.value}(transaction.data);
         require(success, "tx failed");
