@@ -26,6 +26,7 @@ contract MultisigWallet {
         uint numConfirmations;
         uint creationTimestamp;
         uint executionTimestamp;
+        uint executionBlock;
         address[] signers;
     }
 
@@ -91,7 +92,8 @@ contract MultisigWallet {
                 numConfirmations: 0,
                 signers: new address[](owners.length),
                 creationTimestamp: block.timestamp,
-                executionTimestamp: 0
+                executionTimestamp: 0,
+                executionBlock: block.number
             })
         );
 
