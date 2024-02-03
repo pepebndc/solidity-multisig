@@ -139,11 +139,20 @@ contract MultisigWallet {
         uint _txIndex
     ) public onlyOwner txExists(_txIndex) notExecuted(_txIndex) {
         Transaction storage transaction = transactions[_txIndex];
+        address[] storage signers = transaction.signers;
 
         require(isConfirmed[_txIndex][msg.sender], "tx not confirmed");
 
         transaction.numConfirmations -= 1;
         isConfirmed[_txIndex][msg.sender] = false;
+
+        for (uint i = 0; i < signers.length; i++) {
+            if (signers[i] == msg.sender) {
+                signers[i] = signers[signers.length - 1];
+                signers.pop();
+                break;
+            }
+        }
 
         emit RevokeConfirmation(msg.sender, _txIndex);
     }
