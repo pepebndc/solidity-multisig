@@ -15,7 +15,7 @@ contract MultisigWallet is ERC1155Holder, ERC721Holder {
     );
     event ConfirmTransaction(address indexed owner, uint indexed txIndex);
     event RevokeConfirmation(address indexed owner, uint indexed txIndex);
-    event ExecuteTransaction(address indexed owner, uint indexed txIndex);
+    event ExecuteTransaction(address indexed owner, uint indexed txIndex, uint numConfirmationsRequired);
 
     address[] public owners;
     mapping(address => bool) public isOwner;
@@ -164,7 +164,7 @@ contract MultisigWallet is ERC1155Holder, ERC721Holder {
         (bool success, ) = transaction.to.call{value: transaction.value}(transaction.data);
         require(success, "tx failed");
 
-        emit ExecuteTransaction(msg.sender, _txIndex);
+        emit ExecuteTransaction(msg.sender, _txIndex, numConfirmationsRequired);
     }
 
     function revokeConfirmation(
